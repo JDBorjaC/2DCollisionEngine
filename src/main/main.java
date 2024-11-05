@@ -1,10 +1,10 @@
 
 package main;
 
-import engine.Engine;
-import engine.GameLoop;
+import Scenes.Scenes;
+import core.engine.GameLoop;
 import javax.swing.JFrame;
-import rendering.Renderer;
+import core.engine.Renderer;
 
 public class main {
     public static void main(String[] args) {
@@ -19,7 +19,7 @@ public class main {
         frame.pack(); //Adjust to renderer's desired size
         frame.setVisible(true);
         
-        GameLoop gameloop = new GameLoop(new Engine(renderer), renderer);
+        GameLoop gameloop = new GameLoop(Scenes.Scene1(), renderer);
         gameloop.startMainThread();
         
     }

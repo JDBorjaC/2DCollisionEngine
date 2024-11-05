@@ -62,4 +62,6 @@ public class Vector2D {
         float epsilon = 6e-7f;
         return distanceTo(other) < epsilon;
     }
+    
+    
 }
