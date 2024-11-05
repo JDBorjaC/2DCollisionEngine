@@ -63,5 +63,9 @@ public class Vector2D {
         return distanceTo(other) < epsilon;
     }
     
+    @Override
+    public String toString(){
+        return "("+x+", "+y+")";
+    }
     
 }

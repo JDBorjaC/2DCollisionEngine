@@ -15,6 +15,41 @@ import utils.Vector2D;
 
 public class EllasticSolver {
 
+    public void resolveBounds(WorldBounds wb, Entity b) {
+        if (b.collisionShape instanceof CircleShape circle) {
+            
+            
+            //Rectangle edges
+            float left = wb.position.x;
+            float right = left + wb.outline.width;
+            float top = wb.position.y;
+            float bottom = top + wb.outline.height;
+            
+            //Circle properties
+            Vector2D pos = b.position;
+            Vector2D vel = b.velocity;
+            float r = circle.radius;
+            
+            
+            if (pos.x - r < left) {
+                pos.x = left + r; 
+                vel.x *= -1;
+            } else if (pos.x + r > right) {
+                pos.x = right - r;
+                vel.x *= -1;
+            }
+
+            if (pos.y - r < top) {
+                pos.y = top + r;
+                vel.y *= -1;
+            } else if (pos.y + r > bottom) {
+                pos.y = bottom - r;
+                vel.y *= -1;
+            }
+            
+        }
+    }
+
     public void resolve(Entity a, Entity b) {
         Vector2D cn = getCollisionNormal(a, b);
         float overlap = overlapDist(a, b);
@@ -24,25 +59,21 @@ public class EllasticSolver {
     }
 
     public void resolveAsParticles(Entity a, Entity b, Vector2D collisionNormal) {
-        /*
-        float va = a.velocity.length();
-        float vb = b.velocity.length();
-        float ma = a.mass;
-        float mb = b.mass;
-        
-        float factor = -2*ma*mb/(ma+mb);
-        
-        Vector2D impulse = new Vector2D(vb-va, b.position.distanceTo(a.position)).times(factor);
-        */
+        Vector2D relativeVelocity = b.velocity.subtract(a.velocity);
+        float velocityNormal = relativeVelocity.dot(collisionNormal);
 
+        if (velocityNormal > 0) {
+            return;
+        }
+
+        float impulseLength = 2f * velocityNormal / (1 / a.mass + 1 / b.mass);
+        Vector2D impulse = collisionNormal.times(impulseLength);
         if (a instanceof RigidBody) {
-            a.velocity = a.velocity.reflect();
-            //a.adjustVelocity(impulse.times(-1/ a.mass));
+            a.adjustVelocity(impulse.times(1f / a.mass));
         }
 
         if (b instanceof RigidBody) {
-            b.velocity = b.velocity.reflect();
-            //b.adjustVelocity(impulse.times(1/ b.mass));
+            b.adjustVelocity(impulse.times(-1f / b.mass));
         }
 
     }
@@ -52,7 +83,7 @@ public class EllasticSolver {
             return;
         }
 
-        float halfOverlap = 0.5f * overlap;
+        float halfOverlap = overlap / 2f;
 
         a.adjustPosition(collisionNormal.times(-halfOverlap));
         b.adjustPosition(collisionNormal.times(halfOverlap));
@@ -62,13 +93,6 @@ public class EllasticSolver {
         if (a.collisionShape instanceof CircleShape && b.collisionShape instanceof CircleShape) {
             Vector2D collisionNormal = b.position.subtract(a.position).normalize();
             return collisionNormal;
-        }
-        else if (a instanceof WorldBounds wb) {
-            if (b.collisionShape instanceof CircleShape) {
-                CircleShape c = (CircleShape) b.collisionShape;
-                RectangleShape rect = (RectangleShape) wb.collisionShape;
-                return MathUtils.closestPoint(c, b.position, rect, wb.position).normalize();
-            }
         }
 
         throw new UnsupportedOperationException(

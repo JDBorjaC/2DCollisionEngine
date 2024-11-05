@@ -17,14 +17,13 @@ public class NarrowPhase {
     public void detectCollisions(WorldBounds worldBounds, List<Entity> entities) {
 
         //Prevent entities from leaving the world
-        /*
+        
         for (Entity entity : entities) {
             if (!worldBounds.contains(entity)) {
-                System.out.println("Ayooo");
-                solver.resolve(worldBounds, entity);
+                solver.resolveBounds(worldBounds, entity);
             }
         }
-*/
+
 
         for (int i = 0; i < entities.size() - 1; i++) {
             for (int j = i + 1; j < entities.size(); j++) {

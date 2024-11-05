@@ -22,7 +22,7 @@ public class RectangleShape extends Shape {
         this.width = length;
         this.height = length;
     }
-    
+
     public boolean intersectsWithRectangleShape(
             Vector2D position,
             RectangleShape other,
@@ -39,23 +39,26 @@ public class RectangleShape extends Shape {
         return rect.intersects(otherRect);
     }
 
-    public boolean intersectsWithCircle(
+    public boolean containsCircle(
             Vector2D position,
             CircleShape circle,
             Vector2D circleCenter
     ) {
-        /*
-        If the distance from the circle's position to the
-        closest point in the rectangle isn't bigger than the 
-        radius, then there's an intersection
-        */
-        return MathUtils.closestPoint(
-                circle, circleCenter, this, position
-        ).distanceTo(circleCenter) <= circle.radius;
+        // Calcula los límites del rectángulo
+        float left = position.x;
+        float right = position.x + width;
+        float top = position.y;
+        float bottom = position.y + height;
+
+        // Comprueba si el círculo está dentro de los límites del rectángulo
+        return (circleCenter.x - circle.radius > left)
+                && (circleCenter.x + circle.radius < right)
+                && (circleCenter.y - circle.radius > top)
+                && (circleCenter.y + circle.radius < bottom);
     }
 
     @Override
-    public boolean intersects(Vector2D position, Shape other, 
+    public boolean intersects(Vector2D position, Shape other,
             Vector2D otherPosition
     ) {
 
@@ -64,7 +67,7 @@ public class RectangleShape extends Shape {
                     position, otherRect, otherPosition
             );
         } else if (other instanceof CircleShape circle) {
-            return intersectsWithCircle(
+            return containsCircle(
                     position, circle, otherPosition
             );
         }
@@ -76,10 +79,11 @@ public class RectangleShape extends Shape {
     public Rectangle getRect() {
         return new Rectangle(width, height);
     }
+
     @Override
     public Rectangle getRect(Vector2D position) {
         return new Rectangle(
-                (int)position.x, (int)position.y, 
+                (int) position.x, (int) position.y,
                 width, height
         );
     }
